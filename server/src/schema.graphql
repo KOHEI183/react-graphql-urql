@@ -1,5 +1,18 @@
 scalar DateTime
 
+# バックエンドからすべてのリンクを取得。このクエリでは、フィルター、並べ替え、およびページ付けの引数も使用できる
+# 例 feedサーバーから最初の 10 個のリンクを取得するクエリ
+# {
+#   feed(skip: 0, first: 10) {
+#     links {
+#       description
+#       url
+#       postedBy {
+#         name
+#       }
+#     }
+#   }
+# }
 type Query {
   info: String!
   feed(filter: String, skip: Int, first: Int, orderBy: LinkOrderByInput): Feed!
@@ -19,15 +32,35 @@ type Feed {
   count: Int!
 }
 
+# 例：signup新しいユーザーを作成するためのミューテーション
+# mutation {
+#   signup(
+#     name: "Sarah",
+#     email: "sarah@graph.cool",
+#     password: "graphql"
+#   ) {
+#     token
+#     user {
+#       id
+#     }
+#   }
+# }
+
 type Mutation {
+  # 認証されたユーザーが新しいリンクを作成できる
   post(url: String!, description: String!): Link!
+  # 新しいユーザーのアカウントを作成
   signup(email: String!, password: String!, name: String!): AuthPayload
+  #  既存のユーザーにログイン
   login(email: String!, password: String!): AuthPayload
+  # 認証されたユーザーが既存のリンクに投票できる
   vote(linkId: ID!): Vote!
 }
 
 type Subscription {
+  # 新しいリンクが作成されると、リアルタイムの更新を受け取れる
   newLink: Link
+  # 投票が送信されたときにリアルタイムで最新情報を受け取る
   newVote: Vote
 }
 
