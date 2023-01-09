@@ -3,13 +3,14 @@ import ReactDOM from "react-dom/client";
 import "./styles/index.css";
 import App from "./components/App";
 import reportWebVitals from "./reportWebVitals";
-import { Provider, Client, defaultExchanges } from "urql";
+import { Provider, Client, dedupExchange, fetchExchange } from "urql";
+import { cacheExchange } from "@urql/exchange-graphcache";
 // https://www.howtographql.com/react-urql/1-getting-started/
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
-
+const cache = cacheExchange({});
 /**
  * @description urqlの初期設定
  * rql には中央のクライアントがあります。
@@ -22,8 +23,9 @@ const root = ReactDOM.createRoot(
  */
 const client = new Client({
   url: "http://localhost:4000",
-  exchanges: defaultExchanges,
+  exchanges: [dedupExchange, cache, fetchExchange],
 });
+// リストは特定の順序になっています (基本的に: fetch最後と dedup最初。）
 
 // urql クライアント用のコンテキスト プロバイダでラップ
 root.render(
